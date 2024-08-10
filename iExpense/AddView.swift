@@ -1,6 +1,6 @@
 //
 //  AddView.swift
-//  iExpense
+//  iExpense2s
 //
 //  Created by Paul Hudson on 16/10/2023.
 //
@@ -8,15 +8,15 @@
 import SwiftUI
 
 struct AddView: View {
+    @Environment(\.modelContext) var modelContext
     @Environment(\.dismiss) var dismiss
 
     @State private var name = ""
     @State private var type = "Personal"
     @State private var amount = 0.0
 
-    var expenses: Expenses
-
     let types = ["Business", "Personal"]
+    let localCurrency = Locale.current.currency?.identifier ?? "USD"
 
     var body: some View {
         NavigationStack {
@@ -29,14 +29,14 @@ struct AddView: View {
                     }
                 }
 
-                TextField("Amount", value: $amount, format: .currency(code: "USD"))
+                TextField("Amount", value: $amount, format: .currency(code: localCurrency))
                     .keyboardType(.decimalPad)
             }
             .navigationTitle("Add new expense")
             .toolbar {
                 Button("Save") {
                     let item = ExpenseItem(name: name, type: type, amount: amount)
-                    expenses.items.append(item)
+                    modelContext.insert(item)
                     dismiss()
                 }
             }
@@ -45,5 +45,6 @@ struct AddView: View {
 }
 
 #Preview {
-    AddView(expenses: Expenses())
+    AddView()
+        .modelContainer(for: ExpenseItem.self)
 }
